@@ -1,64 +1,141 @@
-import Image from "next/image";
+"use client";
+import { use, useState } from "react";
+import PdfUploader from "@/components/PdfUploader";
+import InfoFormColumn from "@/components/InfoFrom";
+import Navbar from "@/components/Navbar/Navbar";
 
 export default function Home() {
+  const [pdfBuffer, setPdfBuffer] = useState<ArrayBuffer | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [pdfFileName, setPdfFileName] = useState<string | null>(null);
+  const [data, setData] = useState<any>({});
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
+  const [s3Key, setS3Key] = useState<string | null>(null);
+  const [file_name, setFileName] = useState<string | null>(null);
+  const [formData, setFormData] = useState<any>({});
+
+  const [isExtracted, setIsExtracted] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  const [isExtracting, setIsExtracting] = useState(false);
+
+  // Called after PDF upload completes
+  const handleUploadComplete = async (
+    uploadedFileUrl: string,
+    uploadedS3Key: string,
+    file_name: string,
+  ) => {
+    setFileUrl(uploadedFileUrl);
+    setS3Key(uploadedS3Key);
+    setFileName(file_name);
+    setIsExtracting(true);
+
+    try {
+      const res = await fetch("/api/extract", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fileUrl: uploadedFileUrl }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Extraction failed");
+
+      // Convert Gemini raw string to object
+      const extracted: any = {};
+      data.extractedText.split("\n").forEach((line: string) => {
+        const [key, ...rest] = line.split(":");
+        if (key && rest.length) extracted[key.trim()] = rest.join(":").trim();
+      });
+
+      setFormData(extracted);
+      setIsExtracted(true);
+    } catch (err) {
+      console.error(err);
+      alert("Extraction failed: " + (err as Error).message);
+    } finally {
+      setIsExtracting(false);
+    }
+  };
+
+  // Called when Save / Submit button is clicked
+  const handleSaveDocument = async () => {
+    if (!fileUrl && !isEditMode) return alert("Upload PDF first"); // allow edit without changing file
+
+    let formattedDate: string | null = null;
+    if (formData.date_of_report) {
+      const date = new Date(formData.date_of_report);
+      if (!isNaN(date.getTime())) {
+        formattedDate = date.toISOString().split("T")[0];
+      } else {
+        const parts = formData.date_of_report.split("/");
+        if (parts.length === 3) {
+          formattedDate = `${parts[2]}-${parts[1].padStart(2, "0")}-${parts[0].padStart(2, "0")}`;
+        }
+      }
+    }
+
+    const payload: any = {
+      ...formData,
+      date_of_report: formattedDate,
+    };
+
+    // Only include PDF info if it's a new upload
+    if (!isEditMode) {
+      payload.s3_key = s3Key;
+      payload.s3_url = fileUrl;
+      payload.file_name = file_name;
+    }
+
+    try {
+      const apiUrl = isEditMode
+        ? `/api/documents/${formData.id}`
+        : "/api/save_data";
+
+      const res = await fetch(apiUrl, {
+        method: isEditMode ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Operation failed");
+
+      alert(
+        isEditMode
+          ? "Document updated successfully!"
+          : "Document saved successfully!",
+      );
+    } catch (err) {
+      console.error(err);
+      alert("Operation failed: " + (err as Error).message);
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="bg-gray-300">
+      <main className="min-h-screen p-4 text-black bg-gray-300 flex flex-col md:flex-row gap-4">
+        {/* Left column: PDF upload */}
+
+        <PdfUploader
+          setPdfBuffer={setPdfBuffer}
+          setPdfUrl={setPdfUrl}
+          isExtracting={isExtracting}
+          onUploadComplete={handleUploadComplete}
+          onDocumentSelected={(docData) => {
+            setIsExtracted(true);
+            setIsEditMode(true);
+            setFormData(docData);
+          }}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+
+        {/* Right column: Editable info form */}
+        <InfoFormColumn
+          isExtracted={isExtracted}
+          isEditMode={isEditMode}
+          data={formData}
+          setData={setFormData}
+          onSave={handleSaveDocument}
+        />
       </main>
     </div>
   );
