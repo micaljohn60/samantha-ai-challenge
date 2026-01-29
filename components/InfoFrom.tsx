@@ -16,7 +16,7 @@ export default function InfoFormColumn({
   isExtracted,
   isEditMode,
 }: InfoFormColumnProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const [patients, setPatients] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
@@ -31,9 +31,9 @@ export default function InfoFormColumn({
   const [categoryDropdownUp, setCategoryDropdownUp] = useState(false);
   const [showDoctorDropDown, setShowDoctorDropDown] = useState(false);
 
-  const gpRef = useRef<HTMLDivElement>(null);
-  const patientRef = useRef<HTMLDivElement>(null);
-  const categoryRef = useRef<HTMLDivElement>(null);
+  const gpRef = useRef<HTMLDivElement | null>(null);
+  const patientRef = useRef<HTMLDivElement | null>(null);
+  const categoryRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -319,7 +319,6 @@ export default function InfoFormColumn({
             <label className="block mb-1 font-medium">Category</label>
             <input
               type="text"
-              ref={categoryRef}
               value={searchCategory}
               onChange={(e) => {
                 setSearchCategory(e.target.value);
