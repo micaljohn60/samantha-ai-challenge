@@ -11,6 +11,7 @@ export async function GET() {
         json_agg(
           json_build_object(
             'document_id', d.id, 
+            'gp_name', d.doctor_name,
             's3_key' , d.s3_key,
             'document_subject', d.document_subject,
             'date_of_report', d.date_of_report
