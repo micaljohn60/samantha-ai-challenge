@@ -1,3 +1,6 @@
+// API route to fetch all patients from the database,
+// ordered alphabetically by full name
+
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
 // import { Pool } from "pg";

@@ -1,3 +1,6 @@
+// API route to fetch all documents with basic
+// info, ordered by newest first
+
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
 // import { Pool } from "pg";

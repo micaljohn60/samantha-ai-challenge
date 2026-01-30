@@ -1,3 +1,6 @@
+// API route to fetch all distinct doctor names
+// from the documents table, sorted alphabetically
+
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
 // import { Pool } from "pg";

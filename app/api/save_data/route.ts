@@ -1,3 +1,6 @@
+// API route to create a new document: ensures the patient exists, maps the category,
+// inserts the document into the database, and returns the new document ID
+
 import { NextRequest, NextResponse } from "next/server";
 // import { Pool } from "pg";
 import pool from "@/lib/db";

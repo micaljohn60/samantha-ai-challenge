@@ -1,3 +1,6 @@
+// API route to fetch all categories from the database,
+// ordered alphabetically by name
+
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
 

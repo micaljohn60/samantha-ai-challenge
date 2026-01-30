@@ -1,3 +1,6 @@
+// API route to GET a document by ID with patient and category info,
+// and to UPDATE a document and related patient details
+
 import { NextResponse, NextRequest } from "next/server";
 import pool from "@/lib/db";
 // import { Pool } from "pg";
@@ -67,7 +70,6 @@ export async function PUT(
     const data = await req.json();
     const { gp_doctor, patient_name, prefix } = data;
 
-    // 1️⃣ Update patient doctor info (optional: also update patient name/prefix)
     const patientRes = await pool.query(
       `SELECT patient_id FROM documents WHERE id = $1 LIMIT 1`,
       [id],
@@ -89,7 +91,6 @@ export async function PUT(
       ]);
     }
 
-    // Optional: Update patient prefix / name if you want
     if (prefix || patient_name) {
       await pool.query(
         `UPDATE patients SET prefix = COALESCE($1, prefix), full_name = COALESCE($2, full_name) WHERE id = $3`,
@@ -97,7 +98,6 @@ export async function PUT(
       );
     }
 
-    // 2️⃣ Update document info (exclude s3_key/s3_url/file_name)
     await pool.query(
       `
       UPDATE documents SET

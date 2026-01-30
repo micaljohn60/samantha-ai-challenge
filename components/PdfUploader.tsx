@@ -94,7 +94,7 @@ export default function PdfUploader({
         <button
           onClick={handleUpload}
           disabled={!pdfFile || loading || isExtracting}
-          className="ml-auto bg-blue-500 text-white px-5 py-2 rounded-xl hover:bg-blue-700 disabled:opacity-50"
+          className="ml-auto bg-gradient-to-r from-blue-600 to-cyan-400 text-white px-5 py-2 rounded-xl hover:bg-blue-700 disabled:opacity-50"
         >
           {loading
             ? "Uploading..."

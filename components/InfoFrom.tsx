@@ -31,6 +31,8 @@ export default function InfoFormColumn({
   const [categoryDropdownUp, setCategoryDropdownUp] = useState(false);
   const [showDoctorDropDown, setShowDoctorDropDown] = useState(false);
 
+  const [storeIn, setStoreIn] = useState("Correspondence");
+
   const gpRef = useRef<HTMLDivElement | null>(null);
   const patientRef = useRef<HTMLDivElement | null>(null);
   const categoryRef = useRef<HTMLDivElement | null>(null);
@@ -146,8 +148,8 @@ export default function InfoFormColumn({
             !isExtracted
               ? "bg-gray-400 cursor-not-allowed"
               : isEditMode
-                ? "bg-blue-600 hover:bg-blue-700"
-                : "bg-green-600 hover:bg-green-700"
+                ? "bg-gradient-to-r from-blue-600 to-cyan-400 "
+                : "bg-gradient-to-r from-blue-600 to-cyan-400  "
           }`}
         >
           {isEditMode ? "Update Document" : "Save / Submit"}
@@ -207,7 +209,6 @@ export default function InfoFormColumn({
         </div>
       </div>
 
-      {/* Two-column grid for Date of Report + Document Subject */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block mb-1 font-medium">Date of Report</label>
@@ -256,8 +257,11 @@ export default function InfoFormColumn({
           <label className="block mb-1 font-medium">Store In</label>
           <select
             name="store_in"
-            value={data.store_in || ""}
-            onChange={handleChange}
+            value={data.store_in || storeIn}
+            onChange={(e) => {
+              setStoreIn(e.target.value);
+              setData({ ...data, store_in: e.target.value });
+            }}
             disabled={!isExtracted}
             className={`border border-gray-300 p-3 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-green-400 ${
               !isExtracted ? "bg-gray-100 cursor-not-allowed" : ""

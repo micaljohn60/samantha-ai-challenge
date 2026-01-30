@@ -1,3 +1,5 @@
+// API route to fetch a PDF file from AWS S3 by key and return it as an inline response
+
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 
 const s3 = new S3Client({

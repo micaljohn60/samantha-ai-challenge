@@ -15,7 +15,9 @@ export default function Navbar() {
     <header className="w-full mx-auto  bg-white border border-gray-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
         {/* Logo */}
-        <h1 className="text-xl font-bold text-gray-800">Samantha.ai</h1>
+        <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 bg-clip-text text-transparent">
+          Samantha.ai
+        </h1>
 
         {/* Nav Links */}
         <nav className="flex items-center gap-3">
@@ -30,7 +32,7 @@ export default function Navbar() {
                 className={`group flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300
               ${
                 isActive
-                  ? "bg-blue-600 text-white shadow-md"
+                  ? "bg-gradient-to-r from-blue-600 to-cyan-400 text-white shadow-md"
                   : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
               }`}
               >
@@ -45,7 +47,7 @@ export default function Navbar() {
         </nav>
 
         {/* Profile Avatar */}
-        <div className="h-9 w-9 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold shadow">
+        <div className="h-9 w-9 rounded-full bg-gradient-to-r from-blue-600 to-cyan-400 text-white flex items-center justify-center font-semibold shadow">
           MJ
         </div>
       </div>

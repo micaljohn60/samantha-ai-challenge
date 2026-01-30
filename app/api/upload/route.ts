@@ -1,3 +1,6 @@
+// API route to upload a PDF to AWS S3: reads the file from the request,
+// uploads it to S3, and returns a signed URL for access
+
 import { NextRequest, NextResponse } from "next/server";
 import {
   S3Client,
@@ -32,7 +35,7 @@ export async function POST(req: NextRequest) {
 
     const key = `uploads/${Date.now()}-${fileName}`;
 
-    // ✅ Actually upload to S3
+    // Actually upload to S3
     await s3.send(
       new PutObjectCommand({
         Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME!,
@@ -42,14 +45,14 @@ export async function POST(req: NextRequest) {
       }),
     );
 
-    // ✅ Generate signed URL
+    // Generate signed URL
     const signedUrl = await getSignedUrl(
       s3,
       new GetObjectCommand({
         Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME!,
         Key: key,
       }),
-      { expiresIn: 3600 }, // 1 hour
+      { expiresIn: 3600 },
     );
 
     console.log("Signed URL:", signedUrl);

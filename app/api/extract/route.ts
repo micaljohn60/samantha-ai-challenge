@@ -1,3 +1,6 @@
+// API route to extract medical document data from a PDF using Gemini 2.5 Flash,
+// fetching the PDF from S3 and returning extracted fields like patient name, date, category, etc.
+
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import fetch from "node-fetch";
@@ -66,9 +69,8 @@ Return your output as plain text (do NOT wrap in JSON or code blocks). Convert d
     const response = await result.response;
     const text = response.text();
 
-    console.log("Gemini raw output:", text);
+    // console.log("Gemini raw output:", text);
 
-    // ✅ Return raw string directly
     return NextResponse.json({ extractedText: text });
   } catch (err: any) {
     console.error("Gemini extraction failed:", err);

@@ -4,6 +4,7 @@ import PdfUploader from "@/components/PdfUploader";
 import InfoFormColumn from "@/components/InfoFrom";
 import Navbar from "@/components/Navbar/Navbar";
 import ErrorMessage from "@/components/ui/ErrorMessage/ErrorMessage";
+import Message from "@/components/ui/Message/Message";
 
 export default function Home() {
   const [pdfBuffer, setPdfBuffer] = useState<ArrayBuffer | null>(null);
@@ -21,6 +22,11 @@ export default function Home() {
   const [isExtracting, setIsExtracting] = useState(false);
 
   const [error, setError] = useState<string | null>(null);
+
+  const [message, setMessage] = useState<{
+    text: string;
+    type: "success" | "error" | "info";
+  } | null>(null);
 
   // Called after PDF upload completes
   const handleUploadComplete = async (
@@ -52,13 +58,17 @@ export default function Home() {
 
       setFormData(extracted);
       setIsExtracted(true);
+      setMessage({ text: "Document Extracted Successfully", type: "success" });
     } catch (err) {
       console.error(err);
-      //alert("Extraction failed: " + (err as Error).message);
-      setError(
-        "Extraction failed: " + (err as Error).message ||
+
+      setMessage({
+        text:
+          "Extraction failed: " + (err as Error).message ||
           "Something went wrong",
-      );
+        type: "success",
+      });
+      //alert("Extraction failed: " + (err as Error).message);
     } finally {
       setIsExtracting(false);
     }
@@ -66,7 +76,8 @@ export default function Home() {
 
   // Called when Save / Submit button is clicked
   const handleSaveDocument = async () => {
-    if (!fileUrl && !isEditMode) return alert("Upload PDF first"); // allow edit without changing file
+    if (!fileUrl && !isEditMode)
+      return setMessage({ text: "Please Upload PDF", type: "error" });
 
     let formattedDate: string | null = null;
     if (formData.date_of_report) {
@@ -107,23 +118,33 @@ export default function Home() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Operation failed");
 
-      alert(
-        isEditMode
+      setMessage({
+        text: isEditMode
           ? "Document updated successfully!"
           : "Document saved successfully!",
-      );
+        type: "success",
+      });
     } catch (err) {
-      // console.error(err);
-      // alert("Operation failed: " + (err as Error).message);
-      setError(
-        "Operation Failed " + (err as Error).message || "Something went wrong",
-      );
+      setMessage({
+        text:
+          "Operation Failed " + (err as Error).message ||
+          "Something went wrong",
+        type: "error",
+      });
     }
   };
 
   return (
     <div className="bg-gray-300">
-      <ErrorMessage message={error} onClose={() => setError(null)} />
+      {/* <ErrorMessage message={error} onClose={() => setError(null)} /> */}
+
+      {message && (
+        <Message
+          text={message.text}
+          type={message.type}
+          onClose={() => setMessage(null)}
+        />
+      )}
       <main className="min-h-screen p-4 text-black bg-gray-300 flex flex-col md:flex-row gap-4">
         {/* Left column: PDF upload */}
 

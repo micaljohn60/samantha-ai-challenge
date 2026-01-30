@@ -1,4 +1,8 @@
 // app/api/patients-documents/route.ts
+
+// API route to fetch all patients along with their associated documents,
+// returning each patient with a JSON array of their documents
+
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
 
