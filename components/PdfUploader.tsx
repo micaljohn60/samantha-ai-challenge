@@ -83,7 +83,10 @@ export default function PdfUploader({
     const url = URL.createObjectURL(pdfFile);
     setPdfPreviewUrl(url);
     setPdfUrl(url);
-    console.log("AWS_ACCESS_KEY_ID exists:", !!process.env.AWS_ACCESS_KEY_ID);
+    console.log(
+      "AWS_ACCESS_KEY_ID exists:",
+      !!process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
+    );
     console.log(
       "AWS_SECRET_ACCESS_KEY exists:",
       !!process.env.AWS_SECRET_ACCESS_KEY,
