@@ -158,6 +158,23 @@ export default function Home() {
             setIsEditMode(true);
             setFormData(docData);
           }}
+          onReset={() => {
+            setFormData({
+              patient_name: " ",
+              prefix: "",
+              gp_doctor: "",
+              date_of_report: "",
+              document_subject: "",
+              source_contact: "",
+              store_in: "",
+              category: " ",
+            });
+
+            setIsEditMode(false);
+            setPdfBuffer(null);
+            setPdfUrl(null);
+            setIsExtracted(false);
+          }}
         />
 
         {/* Right column: Editable info form */}

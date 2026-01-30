@@ -10,6 +10,7 @@ interface PdfUploadColumnProps {
   onUploadComplete: (fileUrl: string, s3key: string, file_name: string) => void;
   onDocumentSelected: (docData: any) => void;
   isExtracting: boolean;
+  onReset?: () => void;
 }
 
 export default function PdfUploader({
@@ -18,6 +19,7 @@ export default function PdfUploader({
   onUploadComplete,
   onDocumentSelected,
   isExtracting,
+  onReset,
 }: PdfUploadColumnProps) {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
@@ -91,6 +93,17 @@ export default function PdfUploader({
     <div className="md:w-1/2 bg-white p-6 rounded-2xl shadow-lg space-y-4">
       <div className="flex items-center gap-3">
         <h2 className="text-xl font-bold">Upload PDF</h2>
+        <button
+          onClick={() => {
+            setPdfFile(null);
+            setPdfPreviewUrl(null);
+            setPdfUrl(null);
+            if (onReset) onReset(); // <-- reset parent form
+          }}
+          className="ml-2 px-4 py-2 rounded-xl bg-gray-200 text-gray-700 hover:bg-gray-300"
+        >
+          Reset
+        </button>
         <button
           onClick={handleUpload}
           disabled={!pdfFile || loading || isExtracting}
