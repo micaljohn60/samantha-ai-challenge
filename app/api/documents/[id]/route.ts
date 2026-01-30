@@ -65,7 +65,6 @@ export async function PUT(
   context: { params: Promise<{ id: string }> },
 ) {
   try {
-    // const document_id = parseInt(params.id, 10);
     const { id } = await context.params;
     const data = await req.json();
     const { gp_doctor, patient_name, prefix } = data;
@@ -74,8 +73,7 @@ export async function PUT(
       `SELECT patient_id FROM documents WHERE id = $1 LIMIT 1`,
       [id],
     );
-    console.log("Hello");
-    console.log(id);
+
     if (patientRes.rows.length === 0)
       return NextResponse.json(
         { success: false, error: "Document not found" },
@@ -83,13 +81,6 @@ export async function PUT(
       );
 
     const patient_id = patientRes.rows[0].patient_id;
-
-    if (gp_doctor) {
-      await pool.query(`UPDATE patients SET doctor_name = $1 WHERE id = $2`, [
-        gp_doctor,
-        patient_id,
-      ]);
-    }
 
     if (prefix || patient_name) {
       await pool.query(
