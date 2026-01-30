@@ -44,7 +44,7 @@ export default function PatientsPage() {
 
   return (
     <div className="min-h-screen bg-gray-300 p-8">
-      <div className="max-w-5xl mx-auto space-y-6">
+      <div className="max-w-5xl mx-auto space-y-6 rounded-xl bg-white px-20 py-10">
         <h1 className="text-3xl font-bold text-black">Patients</h1>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">

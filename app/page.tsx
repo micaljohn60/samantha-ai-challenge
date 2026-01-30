@@ -3,6 +3,7 @@ import { use, useState } from "react";
 import PdfUploader from "@/components/PdfUploader";
 import InfoFormColumn from "@/components/InfoFrom";
 import Navbar from "@/components/Navbar/Navbar";
+import ErrorMessage from "@/components/ui/ErrorMessage/ErrorMessage";
 
 export default function Home() {
   const [pdfBuffer, setPdfBuffer] = useState<ArrayBuffer | null>(null);
@@ -18,6 +19,8 @@ export default function Home() {
   const [isEditMode, setIsEditMode] = useState(false);
 
   const [isExtracting, setIsExtracting] = useState(false);
+
+  const [error, setError] = useState<string | null>(null);
 
   // Called after PDF upload completes
   const handleUploadComplete = async (
@@ -51,7 +54,11 @@ export default function Home() {
       setIsExtracted(true);
     } catch (err) {
       console.error(err);
-      alert("Extraction failed: " + (err as Error).message);
+      //alert("Extraction failed: " + (err as Error).message);
+      setError(
+        "Extraction failed: " + (err as Error).message ||
+          "Something went wrong",
+      );
     } finally {
       setIsExtracting(false);
     }
@@ -106,13 +113,17 @@ export default function Home() {
           : "Document saved successfully!",
       );
     } catch (err) {
-      console.error(err);
-      alert("Operation failed: " + (err as Error).message);
+      // console.error(err);
+      // alert("Operation failed: " + (err as Error).message);
+      setError(
+        "Operation Failed " + (err as Error).message || "Something went wrong",
+      );
     }
   };
 
   return (
     <div className="bg-gray-300">
+      <ErrorMessage message={error} onClose={() => setError(null)} />
       <main className="min-h-screen p-4 text-black bg-gray-300 flex flex-col md:flex-row gap-4">
         {/* Left column: PDF upload */}
 
