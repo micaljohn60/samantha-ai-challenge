@@ -23,7 +23,7 @@ const slides = [
     icon: Sparkles,
     gradient: "from-blue-600 to-cyan-400",
     bg: "bg-gradient-to-br from-blue-600 to-cyan-400",
-    title: "Welcome to Samantha.AI",
+    title: "Welcome to Sammy.AI",
     description:
       "Your intelligent document management system for clinics. Eliminate manual data entry and let AI handle the heavy lifting.",
     points: [

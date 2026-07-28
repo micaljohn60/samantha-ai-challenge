@@ -126,7 +126,7 @@ export default function InfoFormColumn({
   return (
     <div
       ref={containerRef}
-      className="md:w-3/4 bg-white text-black p-6 rounded-2xl shadow-lg space-y-5 max-h-screen overflow-y-auto"
+      className="md:w-3/4 bg-white text-black p-6 rounded-3xl border border-gray-100 shadow-sm space-y-5 max-h-screen overflow-y-auto"
     >
       {/* Header */}
       <div className="flex items-center justify-between gap-3 pb-1 border-b border-gray-100">

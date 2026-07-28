@@ -20,7 +20,7 @@ export default function Navbar({ onHelpClick }: NavbarProps) {
         {/* Logo */}
         <Link href="/dashboard">
           <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-400 bg-clip-text text-transparent">
-            Samantha.ai
+            Sammy.ai
           </h1>
         </Link>
 

@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { FileText } from "lucide-react";
+import { FileText, Sparkles, ShieldCheck, Files, FileUp, Download } from "lucide-react";
 import PdfUploader from "@/components/PdfUploader";
 import BatchUploader from "@/components/BatchUploader";
 import InfoFormColumn from "@/components/InfoFrom";
@@ -46,7 +46,7 @@ export default function UploadPage() {
   const [batchActiveId, setBatchActiveId] = useState<string | null>(null);
 
   // shared
-  const [formData, setFormData] = useState<any>({});
+  const [formData, setFormData] = useState<Record<string, string>>({});
   const [isExtracted, setIsExtracted] = useState(false);
   const [message, setMessage] = useState<{
     text: string;
@@ -94,7 +94,7 @@ export default function UploadPage() {
       return setMessage({ text: "Please upload a PDF", type: "error" });
     }
 
-    const payload: any = {
+    const payload: Record<string, string | null> = {
       ...formData,
       date_of_report: formatDate(formData.date_of_report),
     };
@@ -273,7 +273,7 @@ export default function UploadPage() {
   const activeItem = batchQueue.find((it) => it.id === batchActiveId);
 
   return (
-    <div className="min-h-full bg-slate-50 p-4 pt-6">
+    <div className="min-h-full bg-slate-50 px-4 py-6">
       {message && (
         <Message
           text={message.text}
@@ -282,13 +282,49 @@ export default function UploadPage() {
         />
       )}
 
+      <div className="relative overflow-hidden max-w-7xl mx-auto rounded-3xl bg-gradient-to-br from-slate-900 via-blue-950 to-blue-800 p-7 mb-5 shadow-xl shadow-blue-900/10">
+        <div className="absolute -right-16 -top-24 h-64 w-64 rounded-full bg-cyan-400/15 blur-3xl" />
+        <div className="relative flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+          <div>
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-cyan-200 ring-1 ring-white/10">
+              <Sparkles size={12} /> AI-assisted filing
+            </span>
+            <h1 className="text-3xl font-bold text-white mt-4">Document Intake</h1>
+            <p className="text-sm text-blue-100/70 mt-1.5 max-w-xl">
+              Upload clinical PDFs, extract key details, and review everything before it reaches the patient record.
+            </p>
+          </div>
+          <div className="inline-flex self-start lg:self-auto bg-white/10 ring-1 ring-white/15 rounded-xl p-1 backdrop-blur-sm">
+            <button
+              onClick={switchToSingle}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+                !batchMode ? "bg-white text-blue-900 shadow-sm" : "text-blue-100 hover:text-white hover:bg-white/10"
+              }`}
+            >
+              <FileUp size={15} /> Single
+            </button>
+            <button
+              onClick={switchToBatch}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+                batchMode ? "bg-white text-blue-900 shadow-sm" : "text-blue-100 hover:text-white hover:bg-white/10"
+              }`}
+            >
+              <Files size={15} /> Batch
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Sample files banner */}
-      <div className="max-w-7xl mx-auto mb-4">
-        <div className="bg-blue-50 border border-blue-100 rounded-2xl px-5 py-3.5 flex flex-col sm:flex-row sm:items-center gap-3">
+      <div className="max-w-7xl mx-auto mb-5">
+        <div className="bg-white border border-gray-100 shadow-sm rounded-2xl px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="w-10 h-10 shrink-0 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+            <ShieldCheck size={19} />
+          </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-blue-800">Testing the app?</p>
-            <p className="text-xs text-blue-600 mt-0.5">
-              Download these sample clinic documents and upload them to see the AI extraction in action.
+            <p className="text-sm font-semibold text-slate-700">Try the extraction workflow</p>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Use a sample document to preview the complete upload and review experience.
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
@@ -297,40 +333,13 @@ export default function UploadPage() {
                 key={n}
                 href={`/samples/sample-document-${n}.pdf`}
                 download={`sample-document-${n}.pdf`}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-blue-200 text-blue-700 text-xs font-medium rounded-lg hover:bg-blue-100 transition shadow-sm"
+                className="flex items-center gap-1.5 px-3 py-2 bg-slate-50 border border-slate-100 text-slate-600 text-xs font-medium rounded-xl hover:bg-blue-50 hover:text-blue-700 hover:border-blue-100 transition"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
-                </svg>
+                <Download size={12} />
                 Sample {n}
               </a>
             ))}
           </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto mb-5">
-        <div className="inline-flex bg-white border border-gray-200 rounded-xl p-1 shadow-sm">
-          <button
-            onClick={switchToSingle}
-            className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${
-              !batchMode
-                ? "bg-gradient-to-r from-blue-600 to-cyan-400 text-white shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            Single Upload
-          </button>
-          <button
-            onClick={switchToBatch}
-            className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${
-              batchMode
-                ? "bg-gradient-to-r from-blue-600 to-cyan-400 text-white shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            Batch Upload
-          </button>
         </div>
       </div>
 

@@ -31,7 +31,7 @@ export default function BatchUploader({
 
   return (
     <div
-      className={`rounded-2xl shadow-lg px-5 py-3 transition-colors ${isDragging ? "bg-blue-50 border-2 border-blue-400" : "bg-white border-2 border-transparent"}`}
+      className={`rounded-3xl shadow-sm px-5 py-4 transition-colors ${isDragging ? "bg-blue-50 border-2 border-blue-400" : "bg-white border border-gray-100"}`}
       onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
       onDragLeave={() => setIsDragging(false)}
       onDrop={handleDrop}

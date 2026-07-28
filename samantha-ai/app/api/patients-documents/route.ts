@@ -9,7 +9,7 @@ export async function GET(req: Request) {
     const limit = parseInt(searchParams.get("limit") || "12");
     const offset = (page - 1) * limit;
 
-    const redisKey = `patients:page:${page}:limit:${limit}`;
+    const redisKey = `patients:v3:page:${page}:limit:${limit}`;
 
     // Try to get cached data
     const cached = await redis.get(redisKey);
