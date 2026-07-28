@@ -1,6 +1,6 @@
-# Samantha.AI - Clinic Document Application
+# Sammy.AI - Clinic Document Application
 
-**Samantha.AI** is a Next.js application designed for clinics to process and manage documents efficiently. The app allows you to **scan PDFs using Gemini API 2.5 Flash**, extract key patient and document data, save it to a database, and securely store files in an AWS S3 bucket.
+**Sammy.AI** is a Next.js application designed for clinics to process and manage documents efficiently. The app allows you to **scan PDFs using Gemini API 2.5 Flash**, extract key patient and document data, save it to a database, and securely store files in cloud storage.
 
 ---
 

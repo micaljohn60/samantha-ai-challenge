@@ -7,9 +7,15 @@ interface PdfUploadColumnProps {
   setPdfBuffer: Dispatch<SetStateAction<ArrayBuffer | null>>;
   setPdfUrl: Dispatch<SetStateAction<string | null>>;
   onUploadComplete: (fileUrl: string, s3key: string, file_name: string) => void;
-  onDocumentSelected: (docData: any) => void;
+  onDocumentSelected: (docData: Record<string, string>) => void;
   isExtracting: boolean;
   onReset?: () => void;
+}
+
+interface LibraryDocument {
+  id: number;
+  s3_key: string;
+  file_name: string;
 }
 
 export default function PdfUploader({
@@ -60,7 +66,7 @@ export default function PdfUploader({
     }
   };
 
-  const handleSelectFromLibrary = async (doc: any) => {
+  const handleSelectFromLibrary = async (doc: LibraryDocument) => {
     try {
       const fileUrl = `/api/files/${encodeURIComponent(doc.s3_key)}`;
       setPdfPreviewUrl(fileUrl);
@@ -70,7 +76,7 @@ export default function PdfUploader({
       const res = await fetch(`/api/documents/${doc.id}`);
       if (!res.ok) throw new Error("Failed to fetch document data");
 
-      const documentData = await res.json();
+      const documentData = (await res.json()) as Record<string, string>;
       onDocumentSelected({ ...documentData, pdf_s3_key: doc.s3_key, pdf_file_name: doc.file_name });
       setShowLibrary(false);
     } catch (err) {
@@ -90,7 +96,7 @@ export default function PdfUploader({
   const isProcessing = loading || isExtracting;
 
   return (
-    <div className="md:w-1/2 bg-white p-5 rounded-2xl shadow-lg flex flex-col gap-4">
+    <div className="md:w-1/2 bg-white p-5 rounded-3xl border border-gray-100 shadow-sm flex flex-col gap-4">
       {/* Toolbar */}
       <div className="flex items-center gap-2">
         <h2 className="text-lg font-bold text-gray-900 mr-auto">Upload PDF</h2>
@@ -135,10 +141,10 @@ export default function PdfUploader({
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            className={`w-full h-[30rem] border-2 border-dashed rounded-2xl flex flex-col items-center justify-center gap-4 transition-all group ${
+            className={`w-full h-[30rem] border-2 border-dashed rounded-2xl flex flex-col items-center justify-center gap-4 transition-all duration-300 group ${
               isDragging
                 ? "border-blue-500 bg-blue-100 scale-[1.01]"
-                : "border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50 hover:border-blue-400 hover:from-blue-100 hover:to-cyan-100"
+                : "border-slate-200 bg-gradient-to-br from-slate-50 to-blue-50/70 hover:border-blue-300 hover:shadow-inner"
             }`}
           >
             <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center group-hover:scale-105 transition-transform">

@@ -1,11 +1,11 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import NetworkParticles from "@/utils/animaltion/network_particles";
 
 export default function SignIn() {
-  const [email, setEmail] = useState("admin@samantha.ai");
+  const [email, setEmail] = useState("admin@sammy.ai");
   const [password, setPassword] = useState("Admin");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -54,7 +54,7 @@ export default function SignIn() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-slate-800">
-            Samantha<span className="text-blue-600">.AI</span>
+            Sammy<span className="text-blue-600">.AI</span>
           </h1>
           <p className="text-sm text-slate-500 mt-2">Admin Dashboard Login</p>
         </div>
@@ -68,7 +68,7 @@ export default function SignIn() {
             <input
               type="email"
               className="w-full px-4 py-2 border text-gray-800 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-              placeholder="admin@samantha.ai"
+              placeholder="admin@sammy.ai"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required

@@ -9,6 +9,10 @@ import {
   ChevronRight,
   ExternalLink,
   SlidersHorizontal,
+  UsersRound,
+  FolderOpen,
+  Clock3,
+  ArrowUpRight,
 } from "lucide-react";
 
 interface PatientDoc {
@@ -76,6 +80,7 @@ export default function PatientsPage() {
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [patientPage, setPatientPage] = useState(1);
   const [patientTotalPages, setPatientTotalPages] = useState(1);
+  const [patientTotal, setPatientTotal] = useState(0);
   const [patientSearch, setPatientSearch] = useState("");
 
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -97,6 +102,7 @@ export default function PatientsPage() {
         if (json.success) {
           setPatients(json.data);
           setPatientTotalPages(json.pagination.totalPages);
+          setPatientTotal(json.pagination.totalItems);
         }
       })
       .finally(() => setPatientLoading(false));
@@ -156,24 +162,34 @@ export default function PatientsPage() {
   const filteredPatients = patients.filter((p) =>
     p.full_name.toLowerCase().includes(patientSearch.toLowerCase()),
   );
+  const pageDocumentCount = patients.reduce(
+    (total, patient) => total + (patient.documents?.filter((doc) => doc.document_id).length || 0),
+    0,
+  );
 
   return (
     <div className="min-h-full bg-slate-50">
-      <div className="max-w-6xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-6 py-8">
 
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-800">Records</h1>
-            <p className="text-slate-500 mt-1 text-sm">Manage patients and their documents</p>
-          </div>
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-blue-950 to-blue-800 p-7 mb-6 shadow-xl shadow-blue-900/10">
+          <div className="absolute -right-16 -top-24 h-64 w-64 rounded-full bg-cyan-400/15 blur-3xl" />
+          <div className="absolute right-36 -bottom-28 h-56 w-56 rounded-full bg-blue-400/10 blur-3xl" />
+          <div className="relative flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+            <div>
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-cyan-200 ring-1 ring-white/10">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> Live patient registry
+              </span>
+              <h1 className="text-3xl font-bold text-white mt-4">Clinical Records</h1>
+              <p className="text-blue-100/70 mt-1.5 text-sm">One secure view of every patient and document.</p>
+            </div>
 
-          <div className="inline-flex bg-white border border-gray-200 rounded-xl p-1 shadow-sm">
+          <div className="inline-flex self-start lg:self-auto bg-white/10 ring-1 ring-white/15 rounded-xl p-1 backdrop-blur-sm">
             <button
               onClick={() => setTab("patients")}
               className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${
                 tab === "patients"
                   ? "bg-gradient-to-r from-blue-600 to-cyan-400 text-white shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
+                  : "text-blue-100 hover:text-white hover:bg-white/10"
               }`}
             >
               Patients
@@ -183,35 +199,51 @@ export default function PatientsPage() {
               className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${
                 tab === "documents"
                   ? "bg-gradient-to-r from-blue-600 to-cyan-400 text-white shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
+                  : "text-blue-100 hover:text-white hover:bg-white/10"
               }`}
             >
               Documents
             </button>
           </div>
         </div>
+        </div>
 
         {/* ── PATIENTS TAB ─────────────────────────────────────────────── */}
         {tab === "patients" && (
           <>
-            <div className="flex items-center justify-between gap-4 mb-5">
-              <p className="text-sm text-slate-500">
-                {patients.length} patient{patients.length !== 1 ? "s" : ""} on this page
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
+              <div className="rounded-2xl bg-white border border-gray-100 p-4 shadow-sm flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center"><UsersRound size={19} /></div>
+                <div><p className="text-xl font-bold text-slate-800">{patientTotal.toLocaleString()}</p><p className="text-xs text-slate-400">Patient profiles</p></div>
+              </div>
+              <div className="rounded-2xl bg-white border border-gray-100 p-4 shadow-sm flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center"><FolderOpen size={19} /></div>
+                <div><p className="text-xl font-bold text-slate-800">{pageDocumentCount}</p><p className="text-xs text-slate-400">Records on this page</p></div>
+              </div>
+              <div className="rounded-2xl bg-white border border-gray-100 p-4 shadow-sm flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center"><Clock3 size={19} /></div>
+                <div><p className="text-xl font-bold text-slate-800">Updated</p><p className="text-xs text-slate-400">Current registry</p></div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between gap-4 mb-5 rounded-2xl border border-gray-100 bg-white p-3 shadow-sm">
+              <p className="hidden sm:block pl-2 text-sm text-slate-500">
+                Showing {patients.length} profiles
               </p>
-              <div className="relative w-full sm:w-72">
+              <div className="relative w-full sm:w-80">
                 <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
                   type="text"
                   placeholder="Search patients..."
                   value={patientSearch}
                   onChange={(e) => setPatientSearch(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2.5 rounded-xl border text-gray-800 border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent shadow-sm"
+                  className="w-full pl-9 pr-4 py-2.5 rounded-xl border text-gray-800 border-gray-100 bg-slate-50 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
                 />
               </div>
             </div>
 
             {patientLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 mb-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 mb-8">
                 {[...Array(6)].map((_, i) => (
                   <div key={i} className="bg-white border border-gray-100 rounded-2xl shadow-sm p-5 flex items-center gap-4 animate-pulse">
                     <div className="shrink-0 w-12 h-12 rounded-xl bg-gray-200" />
@@ -233,19 +265,27 @@ export default function PatientsPage() {
                   <button
                     key={p.patient_id}
                     onClick={() => setSelectedPatient(p)}
-                    className="text-left bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 p-5 flex items-center gap-4"
+                    className="group relative overflow-hidden text-left bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-xl hover:shadow-blue-900/5 hover:border-blue-100 hover:-translate-y-1 transition-all duration-300 p-5"
                   >
-                    <div className={`shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br ${avatarColor(p.full_name)} flex items-center justify-center text-white font-bold text-sm`}>
-                      {getInitials(p.full_name)}
+                    <div className={`absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r ${avatarColor(p.full_name)} opacity-0 group-hover:opacity-100 transition`} />
+                    <div className="flex items-start gap-4">
+                      <div className={`shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br ${avatarColor(p.full_name)} flex items-center justify-center text-white font-bold text-sm shadow-sm`}>
+                        {getInitials(p.full_name)}
+                      </div>
+                      <div className="flex-1 min-w-0 pt-0.5">
+                        <p className="font-semibold text-slate-800 truncate">{p.full_name}</p>
+                        <p className="text-[11px] text-slate-400 mt-0.5">Patient #{String(p.patient_id).padStart(4, "0")}</p>
+                      </div>
+                      <ArrowUpRight size={16} className="text-slate-300 group-hover:text-blue-500 transition" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-slate-800 truncate">{p.full_name}</p>
-                      <div className="flex items-center gap-1.5 mt-1">
-                        <FileText size={12} className="text-gray-400" />
-                        <span className="text-xs text-gray-500">
+                    <div className="mt-4 pt-3 border-t border-slate-50 flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <FileText size={13} className="text-blue-500" />
+                        <span className="text-xs font-medium text-slate-500">
                           {p.documents?.length || 0} document{p.documents?.length !== 1 ? "s" : ""}
                         </span>
                       </div>
+                      <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-emerald-600"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Active</span>
                     </div>
                   </button>
                 ))}

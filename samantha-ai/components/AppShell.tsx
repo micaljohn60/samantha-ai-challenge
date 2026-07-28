@@ -9,13 +9,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const [showGuide, setShowGuide] = useState(false);
 
   useEffect(() => {
-    if (!localStorage.getItem("samantha_guide_seen")) {
+    if (!localStorage.getItem("sammy_guide_seen")) {
       setShowGuide(true);
     }
   }, []);
 
   const handleCloseGuide = () => {
-    localStorage.setItem("samantha_guide_seen", "1");
+    localStorage.setItem("sammy_guide_seen", "1");
     setShowGuide(false);
   };
 

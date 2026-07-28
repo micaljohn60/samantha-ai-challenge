@@ -10,14 +10,14 @@ import {
   ArrowRight,
   FileText,
   ExternalLink,
+  Sparkles,
+  Activity,
 } from "lucide-react";
-import {
-  ValueType,
-  NameType,
-} from "recharts/types/component/DefaultTooltipContent";
 import {
   BarChart,
   Bar,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   Tooltip,
@@ -42,6 +42,19 @@ interface RecentDoc {
   category_name: string;
   date_of_report: string;
   s3_key: string;
+}
+
+interface CategoryStat {
+  name: string;
+  count: number;
+  value: number;
+  color: string;
+}
+
+interface InsightItem {
+  label?: string;
+  name?: string;
+  count: number;
 }
 
 const avatarColors = [
@@ -105,15 +118,17 @@ const quickActions = [
   },
 ];
 
-const categoryData = [
-  { name: "Lab Results", value: 35, color: "#2563eb" },
-  { name: "Referrals", value: 25, color: "#22d3ee" },
-  { name: "Prescriptions", value: 20, color: "#8b5cf6" },
-  { name: "Medical Reports", value: 12, color: "#10b981" },
-  { name: "Imaging", value: 8, color: "#f59e0b" },
-];
+const categoryColors = ["#2563eb", "#22d3ee", "#8b5cf6", "#10b981", "#f59e0b"];
 
-function CustomTooltip({ active, payload, label }: any) {
+function CustomTooltip({
+  active,
+  payload,
+  label,
+}: {
+  active?: boolean;
+  payload?: Array<{ value: number }>;
+  label?: string;
+}) {
   if (!active || !payload?.length) return null;
   return (
     <div className="bg-white border border-gray-100 rounded-xl shadow-lg px-3 py-2 text-sm">
@@ -130,6 +145,9 @@ export default function DashboardPage() {
   const [activityLoading, setActivityLoading] = useState(true);
   const [recentDocs, setRecentDocs] = useState<RecentDoc[]>([]);
   const [docsLoading, setDocsLoading] = useState(true);
+  const [categoryData, setCategoryData] = useState<CategoryStat[]>([]);
+  const [monthlyData, setMonthlyData] = useState<InsightItem[]>([]);
+  const [doctorData, setDoctorData] = useState<InsightItem[]>([]);
 
   useEffect(() => {
     fetch("/api/stats/activity")
@@ -145,6 +163,32 @@ export default function DashboardPage() {
         if (json.success) setRecentDocs(json.documents);
       })
       .finally(() => setDocsLoading(false));
+
+    fetch("/api/stats/categories")
+      .then((r) => r.json())
+      .then((json) => {
+        if (!json.success) return;
+        const total = json.categories.reduce(
+          (sum: number, category: { count: number }) => sum + category.count,
+          0,
+        );
+        setCategoryData(
+          json.categories.map((category: { name: string; count: number }, index: number) => ({
+            ...category,
+            value: total ? Math.round((category.count / total) * 100) : 0,
+            color: categoryColors[index % categoryColors.length],
+          })),
+        );
+      });
+
+    fetch("/api/stats/insights")
+      .then((r) => r.json())
+      .then((json) => {
+        if (json.success) {
+          setMonthlyData(json.monthly);
+          setDoctorData(json.doctors);
+        }
+      });
   }, []);
 
   const maxCount = Math.max(...activity.map((d) => d.count), 1);
@@ -152,18 +196,34 @@ export default function DashboardPage() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-800">Overview</h1>
-        <p className="text-sm text-slate-500 mt-1">
-          Welcome back : here&apos;s what&apos;s happening
-        </p>
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-blue-950 to-blue-800 p-7 mb-6 shadow-xl shadow-blue-900/10">
+        <div className="absolute -right-16 -top-24 h-64 w-64 rounded-full bg-cyan-400/15 blur-3xl" />
+        <div className="absolute right-48 -bottom-32 h-64 w-64 rounded-full bg-violet-400/10 blur-3xl" />
+        <div className="relative flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-cyan-200 ring-1 ring-white/10">
+              <Activity size={12} /> Clinic operations live
+            </span>
+            <h1 className="text-3xl font-bold text-white mt-4">Good morning</h1>
+            <p className="text-sm text-blue-100/70 mt-1.5">
+              Your document workflow is up to date and ready for review.
+            </p>
+          </div>
+          <Link
+            href="/upload"
+            className="inline-flex self-start md:self-auto items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-blue-900 shadow-lg shadow-black/10 hover:bg-blue-50 hover:-translate-y-0.5 transition-all"
+          >
+            <Sparkles size={16} className="text-blue-600" /> Process a document
+            <ArrowRight size={14} />
+          </Link>
+        </div>
       </div>
 
       <StatsBar />
 
       <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* ── Activity Chart ─────────────────────────────────────────── */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <div className="lg:col-span-2 bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
           <div className="flex items-center justify-between mb-5">
             <div>
               <h2 className="text-sm font-semibold text-slate-700">
@@ -232,7 +292,7 @@ export default function DashboardPage() {
         </div>
 
         {/* ── Quick Actions ──────────────────────────────────────────── */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
           <h2 className="text-sm font-semibold text-slate-700 mb-4">
             Quick Actions
           </h2>
@@ -245,12 +305,11 @@ export default function DashboardPage() {
                 href,
                 bg,
                 iconColor,
-                gradient,
               }) => (
                 <Link
                   key={label}
                   href={href}
-                  className="group flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all"
+                  className="group relative overflow-hidden flex items-center gap-3 p-3.5 rounded-2xl border border-gray-100 hover:border-blue-100 hover:shadow-md hover:-translate-y-0.5 transition-all"
                 >
                   <div
                     className={`shrink-0 w-10 h-10 rounded-xl ${bg} flex items-center justify-center`}
@@ -276,8 +335,54 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* ── Six-month trend and doctor workload ────────────────────── */}
+      <div className="mt-5 grid grid-cols-1 lg:grid-cols-5 gap-5">
+        <div className="lg:col-span-3 bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h2 className="text-sm font-semibold text-slate-700">Document Volume</h2>
+              <p className="text-xs text-gray-400 mt-0.5">Monthly processing trend</p>
+            </div>
+            <span className="text-xs font-semibold px-2.5 py-1 bg-violet-50 text-violet-600 rounded-full">
+              Last 6 months
+            </span>
+          </div>
+          <ResponsiveContainer width="100%" height={210}>
+            <AreaChart data={monthlyData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+              <defs>
+                <linearGradient id="volumeGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.35} />
+                  <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.02} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid vertical={false} stroke="#f1f5f9" />
+              <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+              <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+              <Tooltip content={<CustomTooltip />} cursor={{ stroke: "#ddd6fe" }} />
+              <Area type="monotone" dataKey="count" stroke="#8b5cf6" strokeWidth={2.5} fill="url(#volumeGrad)" />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="lg:col-span-2 bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
+          <div className="mb-5">
+            <h2 className="text-sm font-semibold text-slate-700">Documents by GP</h2>
+            <p className="text-xs text-gray-400 mt-0.5">Record volume by assigned doctor</p>
+          </div>
+          <ResponsiveContainer width="100%" height={210}>
+            <BarChart data={doctorData} layout="vertical" margin={{ top: 0, right: 10, left: 20, bottom: 0 }}>
+              <CartesianGrid horizontal={false} stroke="#f1f5f9" />
+              <XAxis type="number" hide />
+              <YAxis type="category" dataKey="name" width={105} tick={{ fontSize: 10, fill: "#64748b" }} axisLine={false} tickLine={false} />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: "#f8fafc" }} />
+              <Bar dataKey="count" fill="#10b981" radius={[0, 6, 6, 0]} barSize={18} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
       {/* ── Documents by Category ───────────────────────────────────── */}
-      <div className="mt-5 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+      <div className="mt-5 bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
         <div className="mb-5">
           <h2 className="text-sm font-semibold text-slate-700">
             Documents by Category
@@ -304,8 +409,8 @@ export default function DashboardPage() {
               </Pie>
 
               <Tooltip
-                formatter={(value) =>
-                  [`${value ?? 0}%`, "Share"] as [string, string]
+                formatter={(_value, _name, item) =>
+                  [`${item.payload.count} documents`, item.payload.name] as [string, string]
                 }
                 contentStyle={{
                   borderRadius: 12,
@@ -341,7 +446,7 @@ export default function DashboardPage() {
       </div>
 
       {/* ── Recent Uploads ───────────────────────────────────────────── */}
-      <div className="mt-5 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+      <div className="mt-5 bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-sm font-semibold text-slate-700">

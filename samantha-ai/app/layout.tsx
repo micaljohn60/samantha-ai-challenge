@@ -5,7 +5,7 @@ import "@fortawesome/fontawesome-svg-core/styles.css";
 config.autoAddCss = false;
 
 export const metadata = {
-  title: "Samantha.ai",
+  title: "Sammy.ai",
   description: "Patient & Document Management",
 };
 

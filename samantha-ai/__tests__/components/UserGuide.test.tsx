@@ -16,7 +16,7 @@ describe("UserGuide", () => {
   });
 
   it("shows the first slide (Welcome) on mount", () => {
-    expect(screen.getByText("Welcome to Samantha.AI")).toBeInTheDocument();
+    expect(screen.getByText("Welcome to Sammy.AI")).toBeInTheDocument();
   });
 
   it("does not show Back button on first slide", () => {
@@ -40,7 +40,7 @@ describe("UserGuide", () => {
   it("goes back to previous slide when Back is clicked", () => {
     fireEvent.click(screen.getByText("Next"));
     fireEvent.click(screen.getByText("Back"));
-    expect(screen.getByText("Welcome to Samantha.AI")).toBeInTheDocument();
+    expect(screen.getByText("Welcome to Sammy.AI")).toBeInTheDocument();
   });
 
   it("navigates to a specific slide via progress dots", () => {
